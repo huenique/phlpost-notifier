@@ -3,6 +3,8 @@ import json
 from http.client import HTTPException
 from typing import Any
 
+from loguru import logger
+
 
 class Tracker:
     def __init__(
@@ -46,6 +48,7 @@ class Tracker:
             message,
         )
 
+    @logger.catch(asyncio.exceptions.CancelledError, level=1, message=f"task cancelled")
     async def check_status(
         self,
         from_email: str,

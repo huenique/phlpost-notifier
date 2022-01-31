@@ -8,3 +8,5 @@ EMAIL_PASSW: str = config("SERIVCE_EMAIL_PASSWORD", cast=str)
 PHLPOST_URL = "https://tracking.phlpost.gov.ph/HOME/GetSummary"
 
 EMAIL_DOMAIN = "smtp.gmail.com"
+
+DATABASE_URL: str = config("DATABASE_URL", cast=str)

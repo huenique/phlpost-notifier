@@ -48,7 +48,8 @@ class TaskManager:
             try:
                 return await coro_fn(*coro_args)
             finally:
-                del self.tasks[task_name]
+                if task_name in self.tasks:
+                    del self.tasks[task_name]
 
         loop = asyncio.get_running_loop()
         task = loop.create_task(wrapped_coro(), name=task_name)
