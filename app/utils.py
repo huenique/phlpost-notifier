@@ -44,7 +44,7 @@ class TaskManager:
         if task_name in self.tasks:
             raise TaskError(f"'{task_name}' is already scheduled to run")
 
-        async def wrapped_coro():
+        async def wrapped_coro() -> Any:
             try:
                 return await coro_fn(*coro_args)
             finally:

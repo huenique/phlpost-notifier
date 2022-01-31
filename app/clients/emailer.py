@@ -13,10 +13,10 @@ class Emailer:
     def disconnect(self) -> None:
         self.conn.__exit__(None, None, None)
 
-    def identify(self):
+    def identify(self) -> None:
         self.conn.ehlo_or_helo_if_needed()
 
-    def login(self, user: str, passw: str):
+    def login(self, user: str, passw: str) -> "Emailer":
         self.conn.login(user, passw)
         return self
 
@@ -25,7 +25,7 @@ class Emailer:
         from_addr: str,
         to_addrs: str | Sequence[str],
         msg: bytes | str,
-    ):
+    ) -> None:
         self.conn.sendmail(from_addr, to_addrs, msg)
 
     @classmethod

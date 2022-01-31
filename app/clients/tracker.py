@@ -15,7 +15,7 @@ class Tracker:
         self.mail = mail
         self.request_url = request_url
 
-    async def _parse_response(self, data: str | bytes):
+    async def _parse_response(self, data: str | bytes) -> bool:
         data_ = json.loads(data)
 
         if (
@@ -35,7 +35,7 @@ class Tracker:
         else:
             raise HTTPException(f"server return a {resp.status} response")
 
-    async def notify_user(self, from_email: str, email_usr: str, tracking_num: int):
+    async def notify_user(self, from_email: str, email_usr: str, tracking_num: int) -> None:
         message = "Subject: {}\n\n{}".format(
             "PHLPost",
             f"Your item is out for delivery.\nTracking number: {tracking_num}",

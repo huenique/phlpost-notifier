@@ -7,7 +7,7 @@ task = services.TaskService()
 
 
 @app.get("/")
-async def read_root():
+async def read_root() -> dict[str, str]:
     # TODO: show table of users registerd waiting for an email notification
     return {"Hello": "World"}
 
@@ -18,5 +18,5 @@ async def track(info: models.TrackingInfo) -> str:
 
 
 @app.delete("/track/")
-async def untrack(untrack: int):
+async def untrack(untrack: int) -> bool:
     return await task.untrack_number(untrack)

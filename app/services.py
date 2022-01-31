@@ -31,6 +31,6 @@ class TaskService:
         )
         return task_nm
 
-    async def untrack_number(self, tracking_number: int):
+    async def untrack_number(self, tracking_number: int) -> bool:
         return await self.task.stop_task(str(tracking_number))
         # remove number from database
