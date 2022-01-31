@@ -1,3 +1,6 @@
+from asyncio import Task
+from typing import Any
+
 from fastapi import FastAPI
 
 from app import models, services
@@ -13,6 +16,10 @@ async def read_root():
 
 
 @app.post("/track")
-async def track(info: models.TrackingInfo):
-    await task.track_number(info.email_usr, info.number, 5.0)
-    return info
+async def track(info: models.TrackingInfo) -> tuple[str, Task[Any]]:
+    return await task.track_number(info.email_usr, info.tracking_number)
+
+
+@app.post("/untrack")
+async def untrack(tracking_number: int):
+    return await task.untrack_number(tracking_number)
