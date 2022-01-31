@@ -1,4 +1,5 @@
 import asyncio
+from typing import Any
 
 import aiohttp
 
@@ -20,10 +21,14 @@ class TaskService:
         email_usr: str,
         tracking_number: int,
         execute_in: float = 86_400.0,
-    ) -> asyncio.Task[None] | None:
-        loop = asyncio.get_running_loop()
-        await loop.create_task(
-            self.trac.check_status(EMAIL_USR, email_usr, tracking_number, execute_in)
+    ) -> tuple[str, asyncio.Task[Any]]:
+        return await self.task.start_task(
+            self.trac.check_status,
+            str(tracking_number),
+            EMAIL_USR,
+            email_usr,
+            tracking_number,
+            execute_in,
         )
 
     async def untrack_number(self, tracking_number: int):

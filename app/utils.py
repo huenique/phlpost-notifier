@@ -24,7 +24,6 @@ class TaskManager:
         self,
         coro_fn: Callable[..., Coroutine[Any, Any, Any]],
         task_name: str,
-        execute_in: float,
         *coro_args: Any,
     ) -> tuple[str, Task[Any]]:
         """
@@ -47,7 +46,6 @@ class TaskManager:
 
         async def wrapped_coro():
             try:
-                await asyncio.sleep(execute_in)
                 return await coro_fn(*coro_args)
             finally:
                 del self.tasks[task_name]
