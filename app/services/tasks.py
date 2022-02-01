@@ -3,12 +3,14 @@ import asyncio
 import aiohttp
 
 from app import utils
-from app.clients import emailer, tracker
+from app.db.operations import Database
+from app.services import emailer, tracker
 from app.settings import EMAIL_DOMAIN, EMAIL_PASSW, EMAIL_USR, PHLPOST_URL
 
 
 class TaskService:
-    def __init__(self) -> None:
+    def __init__(self, database: Database) -> None:
+        self.db = database
         self.loop = asyncio.get_running_loop()
         self.http = aiohttp.ClientSession()
         self.task = utils.TaskManager()
@@ -28,9 +30,15 @@ class TaskService:
             email_usr,
             tracking_number,
             execute_in,
+            self.db,
         )
         return task_nm
 
     async def untrack_number(self, tracking_number: int) -> bool:
         return await self.task.stop_task(str(tracking_number))
         # remove number from database
+
+    async def close(self):
+        await self.db.close_connection()
+        await self.http.close()
+        self.mail.disconnect()

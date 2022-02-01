@@ -4,6 +4,10 @@ from http.client import HTTPException
 from typing import Any
 
 from loguru import logger
+from pydantic import EmailStr
+
+from app.db.operations import Database
+from app.services import models
 
 
 class Tracker:
@@ -35,7 +39,9 @@ class Tracker:
         else:
             raise HTTPException(f"server return a {resp.status} response")
 
-    async def notify_user(self, from_email: str, email_usr: str, tracking_num: int) -> None:
+    async def notify_user(
+        self, from_email: str, email_usr: str, tracking_num: int
+    ) -> None:
         message = "Subject: {}\n\n{}".format(
             "PHLPost",
             f"Your item is out for delivery.\nTracking number: {tracking_num}",
@@ -55,17 +61,29 @@ class Tracker:
         email_usr: str,
         tracking_num: int,
         exec_in: float,
+        db_conn: Database,
     ) -> None:
+        await db_conn.add_row(
+            models.PackageOwner(email=EmailStr(email_usr), tracking_number=tracking_num)
+        )
+
         while True:
             await asyncio.sleep(exec_in)
 
-            resp = await self.http.post(
-                self.request_url, json={"TrackingNos": [f"{tracking_num}"]}
-            )
+            # Loop through the tracking numbers table and asynchronously query phlpost
+            # for each row
+            tracking_nums = await db_conn.get_all_row(models.PackageOwner)
 
-            if await self._check_response(resp):
-                await self.notify_user(from_email, email_usr, tracking_num)
-                self.mail.disconnect()
+            for num in tracking_nums:
+                resp = await self.http.post(
+                    self.request_url, json={"TrackingNos": [f"{num}"]}
+                )
+
+                # If package with tracking number is out for deliver, notify user and
+                # delete associated row
+                if await self._check_response(resp):
+                    await self.notify_user(from_email, email_usr, tracking_num)
+                    self.mail.disconnect()
 
     @classmethod
     def start(
